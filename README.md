@@ -1,2 +1,3 @@
-# dueros
-baidu dueros for linux (Raspberry Pi) 
+#light dueros
+baidu light dueros for linux (Raspberry Pi)
+
