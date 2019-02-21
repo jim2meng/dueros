@@ -1,56 +1,56 @@
 # dueros
 baidu dueros for linux (Raspberry Pi) 
 
-#DCS3.0 linux demoÊ¹ÓÃËµÃ÷
+#DCS3.0 linux demoä½¿ç”¨è¯´æ˜Ž
 
-¡ª¡ª¡ª¡ª¡ª¡ª¡ª¡ª¡ª¡ª¡ª¡ª¡ª¡ª¡ª¡ª¡ª¡ª¡ª¡ª¡ª¡ª¡ª¡ª¡ª¡ª¡ª¡ª¡ª¡ª¡ª¡ª¡ª¡ª¡ª¡ª¡ª¡ª¡ª¡ª¡ª¡ª¡ª¡ª¡ª¡ª¡ª¡ª¡ª
+â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”â€”
 
-###1. ±àÒë»·¾³´î½¨£º
+### 1. ç¼–è¯‘çŽ¯å¢ƒæ­å»ºï¼š
 
-#### gstreamer1.0 £º
+#### gstreamer1.0 ï¼š
 	sudo apt-get update
 	sudo apt-get install gstreamer1.0*
 	
-	°²×°³É¹¦ÏÂÃæÈýÐÐ²»ÐèÒªÖ´ÐÐ£¬°²×°Ê§°Ü£¬Çë°´ÕÕÏÂÃæ·ÖÈý²½·Ö¿ª°²×°
+	å®‰è£…æˆåŠŸä¸‹é¢ä¸‰è¡Œä¸éœ€è¦æ‰§è¡Œï¼Œå®‰è£…å¤±è´¥ï¼Œè¯·æŒ‰ç…§ä¸‹é¢åˆ†ä¸‰æ­¥åˆ†å¼€å®‰è£…
 	sudo apt-get install libgstreamer1.0*
 	sudo apt-get install gstreamer1.0-omx-generic*
 	sudo apt-get install gstreamer1.0-plugins*
 
-#### snowboy Ê¹ÓÃµÄµÚÈý·½¿â
+#### snowboy ä½¿ç”¨çš„ç¬¬ä¸‰æ–¹åº“
 	sudo apt-get install libatlas-base-dev
 	
-#### alsa £º
+#### alsa ï¼š
 
 	sudo apt-get install alsa-base alsa-utils libasound2-dev
 
 
-###2. ±àÒë·½Ê½£º
+### 2. ç¼–è¯‘æ–¹å¼ï¼š
 
-ÔÚ¹¤³ÌÎÄ¼þÏÂÔËÐÐÒÔÏÂÃüÁî£º
+åœ¨å·¥ç¨‹æ–‡ä»¶ä¸‹è¿è¡Œä»¥ä¸‹å‘½ä»¤ï¼š
 
 1,make
 
 
-###3. ÔËÐÐ·½Ê½£º
+### 3. è¿è¡Œæ–¹å¼ï¼š
 
-ÔËÐÐ±àÒëÉú³ÉµÄ¿ÉÖ´ÐÐÎÄ¼þ`duerospi`£¬ -p `<Â·¾¶>/profile`,Ä¬ÈÏprofileÎªprofile
+è¿è¡Œç¼–è¯‘ç”Ÿæˆçš„å¯æ‰§è¡Œæ–‡ä»¶`duerospi`ï¼Œ -p `<è·¯å¾„>/profile`,é»˜è®¤profileä¸ºprofile
 
-ÀýÈç£º
+ä¾‹å¦‚ï¼š
 
 	./duerospi
 
-###4. °´¼üËµÃ÷£º
+### 4. æŒ‰é”®è¯´æ˜Žï¼š
 
-ÔËÐÐ³É¹¦ºó£¬È·±£¼üÅÌ²»ÔÚ´óÐ´Ëø¶¨×´Ì¬£¬ËùÓÐ°´¼ü¶¼²»ÐèÒª³¤°´¡£
+è¿è¡ŒæˆåŠŸåŽï¼Œç¡®ä¿é”®ç›˜ä¸åœ¨å¤§å†™é”å®šçŠ¶æ€ï¼Œæ‰€æœ‰æŒ‰é”®éƒ½ä¸éœ€è¦é•¿æŒ‰ã€‚
 
- - q £º ÍË³ö
- - w £º Ôö¼ÓÒôÁ¿
- - s £º ¼õÐ¡ÒôÁ¿
- - a £º ÉÏÒ»Çú
- - d £º ÏÂÒ»Çú
- - e £º ¾²Òô
- - z £º ÔÝÍ£/¿ªÊ¼ £¨²¥·Å£©
- - x £º ¿ªÊ¼Â¼Òô
- - c £º ÇÐ»»ÓïÒô½»»¥Ä£Ê½ £¨0£ºÆÕÍ¨Ä£Ê½£¬1£ºÖÐ·­Ó¢£¬2£ºÓ¢·­ÖÐ£©
+ - q ï¼š é€€å‡º
+ - w ï¼š å¢žåŠ éŸ³é‡
+ - s ï¼š å‡å°éŸ³é‡
+ - a ï¼š ä¸Šä¸€æ›²
+ - d ï¼š ä¸‹ä¸€æ›²
+ - e ï¼š é™éŸ³
+ - z ï¼š æš‚åœ/å¼€å§‹ ï¼ˆæ’­æ”¾ï¼‰
+ - x ï¼š å¼€å§‹å½•éŸ³
+ - c ï¼š åˆ‡æ¢è¯­éŸ³äº¤äº’æ¨¡å¼ ï¼ˆ0ï¼šæ™®é€šæ¨¡å¼ï¼Œ1ï¼šä¸­ç¿»è‹±ï¼Œ2ï¼šè‹±ç¿»ä¸­ï¼‰
  
  
