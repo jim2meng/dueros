@@ -1,5 +1,5 @@
 # dueros
-baidu dueros for linux (Raspberry Pi) 
+baidu lightdueros for linux and Raspberry Pi 
 
 #DCS3.0 linux demo使用说明
 
@@ -33,12 +33,14 @@ baidu dueros for linux (Raspberry Pi)
 
 ### 3. 运行方式：
 
-运行编译生成的可执行文件`duerospi`， -p `<路径>/profile`,默认profile为profile
+运行编译生成的可执行文件`duerospi`， -p `<路径>/profile`, -w '[路径]/唤醒词模型文件'
+
+如果不指定唤醒词模型，默认为“小度小度”.
 
 例如：
-
-	./duerospi
-
+	./duerospi -p ./profile
+	./duerospi -p ./profile -w ./resources/models/snowboy.umdl
+	
 ### 4. 按键说明：
 
 运行成功后，确保键盘不在大写锁定状态，所有按键都不需要长按。
