@@ -60,8 +60,24 @@ static duer_rec_config_t *s_index = NULL;
 static bool s_is_suspend = false;
 static bool s_is_baidu_rec_start = false;
 static pthread_t s_rec_send_threadID;
-
+static char * s_kws_model_filename = NULL;
+	
 extern 	void event_record_start();
+
+int duer_set_kws_model_file(char *filename)
+{
+	if(filename==NULL){
+		return 0;
+	}
+	
+	if(s_kws_model_filename==NULL){
+		free(s_kws_model_filename);
+		s_kws_model_filename=NULL;
+	}
+	s_kws_model_filename = strdup(filename);
+	
+	return 0;
+}
 
 static void recorder_thread()
 {
@@ -70,14 +86,21 @@ static void recorder_thread()
 
 	const char resource_filename[] = "resources/common.res";
 	//const char model_filename[] = "snowboy/resources/models/snowboy.umdl";
-	const char model_filename[] = "resources/models/keywords.pmdl,resources/models/peppapig.pmdl";
-	const char sensitivity_str[] = "0.5,0.5";
+	//const char model_filename[] = "resources/models/keywords.pmdl,resources/models/peppapig.pmdl";
+	//const char sensitivity_str[] = "0.5,0.5";
+	//const char model_filename[] = "resources/models/keywords.pmdl";
+	char *model_filename=s_kws_model_filename;
+	const char sensitivity_str[] = "0.5";
 	float audio_gain = 1.1;
 	bool apply_frontend = false;
+
+	if(model_filename==NULL){
+		model_filename = "resources/models/keywords.pmdl";
+	}
 	
 	// Initializes Snowboy detector.
 	SnowboyDetect* detector = SnowboyDetectConstructor(resource_filename,
-	                                                 model_filename);
+	                                                 (const char*)model_filename);
 	SnowboyDetectSetSensitivity(detector, sensitivity_str);
 	SnowboyDetectSetAudioGain(detector, audio_gain);
 	SnowboyDetectApplyFrontend(detector, apply_frontend);
@@ -346,10 +369,11 @@ duer_rec_state_t duer_get_recorder_state()
     return s_duer_rec_state;
 }
 
-int duer_hotwords_detect_start(void)
+int duer_hotwords_detect_start(char *model_filename)
 {
 	int ret=0;
-	
+
+	duer_set_kws_model_file(model_filename);
     s_duer_rec_addr.sin_family = AF_INET;
     s_duer_rec_addr.sin_port = htons(19290);
 	s_duer_rec_addr.sin_addr.s_addr = inet_addr("127.0.0.1");

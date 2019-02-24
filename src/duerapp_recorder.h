@@ -43,7 +43,8 @@ int duer_recorder_stop();
 int duer_recorder_suspend();
 duer_rec_state_t duer_get_recorder_state();
 
-int duer_hotwords_detect_start(void);
+int duer_hotwords_detect_start(char *model_filename);
 
+int duer_set_kws_model_file(char *optarg);
 
 #endif // BAIDU_DUER_LIBDUER_DEVICE_EXAMPLES_DCS3_LINUX_DUERAPP_RECORDER_H

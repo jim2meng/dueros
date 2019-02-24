@@ -190,15 +190,17 @@ static void duer_args_usage(char *param) {
     "Optins:\n"
     "-p  the profile which will be used\n"
     "-r  the alarm bell file\n"
+    "-w  the kws module file\n"
     "-h  Print this message\n\n"
     );
 }
 
 int main(int argc, char *argv[])
 {
+	char *kws_model_fn = "resources/models/keywords.pmdl";
     // Check input arguments
     int c = 0;
-    while((c = getopt(argc, argv, "p:r:")) != -1) {
+    while((c = getopt(argc, argv, "p:r:w:")) != -1) {
         switch(c) {
             case 'p':
                 s_pro_path = optarg;
@@ -206,6 +208,9 @@ int main(int argc, char *argv[])
             case 'r':
                 duer_set_alert_ring(optarg);
                 break;
+			case 'w':
+				kws_model_fn = optarg;
+				break;
             case 'h':
                 duer_args_usage(argv[0]);
                 exit(EXIT_SUCCESS);
@@ -227,13 +232,13 @@ int main(int argc, char *argv[])
     // init media
     duer_media_init();
 
-	duer_hotwords_detect_start();
+	duer_hotwords_detect_start(kws_model_fn);
 	
     // try conntect baidu cloud
     duer_test_start(s_pro_path);
 
     duer_event_loop();
-
+	
     duer_media_destroy();
 
     s_pro_path = NULL;
