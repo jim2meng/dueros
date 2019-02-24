@@ -1,7 +1,7 @@
 # dueros
 baidu lightdueros for linux and Raspberry Pi 
 
-#DCS3.0 linux 使用说明
+#DCS3.0 linux 使用说明(下面所有说明在 linux,树莓派 3B/3B+中验证测试通过)
 
 —————————————————————————————————————————————————
 
