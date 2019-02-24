@@ -34,7 +34,8 @@ baidu lightdueros for linux and Raspberry Pi
 ### 3. 运行方式：
 
 运行编译生成的可执行文件`duerospi`， -p `<路径>/profile`, -w '[路径]/唤醒词模型文件'
-如果不制定唤醒词模型，默认为小度小度.
+
+如果不指定唤醒词模型，默认为“小度小度”.
 
 例如：
 	./duerospi -p ./profile
