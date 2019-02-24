@@ -59,6 +59,7 @@ baidu lightdueros for linux and Raspberry Pi
   
   树莓派默认没有麦克风，要接麦克风才可以正常使用，下面是树莓派专用的麦克风阵列淘宝购买链接为：
   https://diyiot.taobao.com/
+  
   https://item.taobao.com/item.htm?spm=a230r.1.14.7.13d7138aIGBFSI&id=586904707401&ns=1&abbucket=2#detail
   
   
