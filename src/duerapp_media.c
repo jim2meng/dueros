@@ -49,6 +49,7 @@ static GMainLoop *s_loop = NULL;
 static double s_vol = VOLUME_INIT;
 static duer_speak_state_t s_speak_state = MEDIA_SPEAK_STOP;
 static duer_audio_state_t s_audio_state = MEDIA_AUDIO_STOP;
+static duer_tone_state_t  s_tone_state = MEDIA_TONE_STOP;
 
 static play_info_t *create_play_info(const char *url, play_handler func)
 {
@@ -148,7 +149,7 @@ static void speak_play()
     if (s_mute) {
         g_object_set(G_OBJECT(s_pinfo[0]->pip), "volume", 0.0, NULL);
     } else {
-        g_object_set(G_OBJECT(s_pinfo[0]->pip), "volume", s_vol, NULL);
+        //g_object_set(G_OBJECT(s_pinfo[0]->pip), "volume", s_vol, NULL);
     }
     GstBus *bus = gst_pipeline_get_bus(GST_PIPELINE(s_pinfo[0]->pip));
 
@@ -172,7 +173,7 @@ static void audio_play()
     if (s_mute) {
         g_object_set(G_OBJECT(s_pinfo[0]->pip), "volume", 0.0, NULL);
     } else {
-        g_object_set(G_OBJECT(s_pinfo[0]->pip), "volume", s_vol, NULL);
+        //g_object_set(G_OBJECT(s_pinfo[0]->pip), "volume", s_vol, NULL);
     }
     GstBus *bus = gst_pipeline_get_bus(GST_PIPELINE(s_pinfo[0]->pip));
 
@@ -259,6 +260,34 @@ void duer_media_speak_play(const char *url)
     } else {
         DUER_LOGI("Speak info create failed!");
     }
+}
+
+void duer_media_tone_play(const char *path,int wait_tm) {
+	
+    GstElement *pipeline = gst_pipeline_new("audio-player");
+    GstElement *source = gst_element_factory_make("filesrc", "file-source");
+    GstElement *decoder = gst_element_factory_make("mad", "mad-decoder");
+    GstElement *sink = gst_element_factory_make("autoaudiosink", "audio-output");
+    if (!(pipeline && source && decoder && sink)) {
+        DUER_LOGE("create alert element failed!");
+        return;
+    }
+	s_tone_state = MEDIA_TONE_PLAY;
+    g_object_set(G_OBJECT(source), "location", path, NULL);
+
+    GstBus *bus = gst_pipeline_get_bus(GST_PIPELINE(pipeline));
+    guint bus_watch_id = gst_bus_add_watch(bus, bus_call, s_loop);
+    gst_object_unref(bus);
+
+    gst_bin_add_many(GST_BIN(pipeline), source, decoder, sink, NULL);
+    gst_element_link_many(source, decoder, sink, NULL);
+    gst_element_set_state(pipeline, GST_STATE_PLAYING);
+    g_main_loop_run(s_loop);
+    gst_element_set_state(pipeline, GST_STATE_NULL);
+    gst_object_unref(GST_OBJECT(pipeline));
+    g_source_remove(bus_watch_id);
+	s_tone_state = MEDIA_TONE_STOP;
+	
 }
 
 void duer_media_speak_stop()

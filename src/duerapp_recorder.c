@@ -61,6 +61,7 @@ static bool s_is_suspend = false;
 static bool s_is_baidu_rec_start = false;
 static pthread_t s_rec_send_threadID;
 static char * s_kws_model_filename = NULL;
+const char *s_tone_url[3] = {"./resources/60.mp3","./resources/61.mp3","./resources/62.mp3"};
 	
 extern 	void event_record_start();
 
@@ -156,6 +157,7 @@ static void recorder_thread()
         if (result > 0) {
             DUER_LOGI("Hotword %d detected!\n", result);
 			duer_dcs_dialog_cancel();
+			duer_media_tone_play(s_tone_url[rand()%3],5000);
 			event_record_start();
         }
 		

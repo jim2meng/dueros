@@ -30,6 +30,12 @@ typedef enum{
 }duer_speak_state_t;
 
 typedef enum{
+    MEDIA_TONE_PLAY,
+    MEDIA_TONE_STOP,
+}duer_tone_state_t;
+
+
+typedef enum{
     MEDIA_AUDIO_PLAY,
     MEDIA_AUDIO_PAUSE,
     MEDIA_AUDIO_STOP,
@@ -53,5 +59,8 @@ void duer_media_set_volume(int volume);
 int duer_media_get_volume();
 void duer_media_set_mute(bool mute);
 bool duer_media_get_mute();
+
+void duer_media_tone_play(const char *url,int wait_tm);
+
 
 #endif // BAIDU_DUER_LIBDUER_DEVICE_EXAMPLES_DCS3_LINUX_DUERAPP_MEDIA_H
