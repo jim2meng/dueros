@@ -20,7 +20,7 @@ CFLAGS += -I$(TOPDIR)/include -I$(TOPDIR)/include/libduer-device/include -I$(TOP
 CXXFLAGS += -I$(TOPDIR)/include -I$(TOPDIR)/include/libduer-device/include -I$(TOPDIR)/include/snowboy/include -std=c++0x -Wall -Wno-sign-compare \
       -Wno-unused-local-typedefs -Winit-self -rdynamic
       
-LDLIBS +=  -Wl,-rpath=./lib -lduer-device -lsnowboy-detect-c
+LDLIBS +=  -Wl,-rpath=./libs -lduer-device -lsnowboy-detect-c
 
 # Set optimization level.
 CFLAGS += -O3
