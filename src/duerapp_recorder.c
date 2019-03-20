@@ -44,10 +44,12 @@
 #include "snowboy-detect-c-wrapper.h"
 
 #define ALSA_PCM_NEW_HW_PARAMS_API
-#define SAMPLE_RATE (16000)
-#define FRAMES_INIT (16)
-#define FRAMES_SIZE (2) // bytes / sample * channels
-#define CHANNEL (1)
+#define SAMPLE_RATE         (16000)
+#define FRAMES_INIT         (640*10)
+#define CHANNEL 	 	  (1)
+#define FRAMES_SIZE  	  ((16/8) *CHANNEL)// bytes / sample * channels
+//#define PCM_STREAM_CAPTURE_DEVICE	"hw:1,0"
+#define PCM_STREAM_CAPTURE_DEVICE	"default"
 
 static int s_duer_rec_snd_fd=-1;
 static int s_duer_rec_recv_fd=-1;
@@ -76,6 +78,24 @@ int duer_set_kws_model_file(char *filename)
 		s_kws_model_filename=NULL;
 	}
 	s_kws_model_filename = strdup(filename);
+	
+	return 0;
+}
+
+int stereo_to_mono(int16_t *in,int ilen,int16_t *out,int outlen)
+{
+	int i=0;
+	
+	if(CHANNEL==1){
+		memcpy(out,in,ilen<<1);
+		return ilen;
+	}else if(CHANNEL==2){
+		for(i=0;i<ilen>>1;i++){
+			out[i] = (in[2*i]+in[2*i+1])>>1;
+			//out[i] = in[2*i];
+		}
+		return ilen>>1;
+	}
 	
 	return 0;
 }
@@ -123,8 +143,12 @@ static void recorder_thread()
         DUER_LOGE("Get period size failed!");
         return;
     }
+    DUER_LOGI("frames %d dir %d\n",s_index->frames,s_index->dir);
     s_index->size = s_index->frames * FRAMES_SIZE;
     int16_t *buffer = NULL;
+    int16_t *mono_buffer = NULL;
+    int mono_data_size = 0;
+	
     if (buffer) {
         free(buffer);
         buffer = NULL;
@@ -136,6 +160,13 @@ static void recorder_thread()
     } else {
         memset(buffer, 0, s_index->size);
     }
+
+    mono_buffer = (int16_t *)malloc(s_index->size);
+    if (!mono_buffer) {
+        DUER_LOGE("malloc buffer failed!\n");
+    } else {
+        memset(mono_buffer, 0, s_index->size);
+    }
 	
     while (1)
     {
@@ -144,41 +175,51 @@ static void recorder_thread()
         if (ret == -EPIPE) {
             DUER_LOGE("an overrun occurred!");
             snd_pcm_prepare(s_index->handle);
+	    continue;
         } else if (ret < 0) {
             DUER_LOGE("read: %s", snd_strerror(ret));
+	    continue;
         } else if (ret != (int)s_index->frames) {
             DUER_LOGE("read %d frames!", ret);
+	    continue;
         } else {
             // do nothing
+	    printf("ret=%d\n",ret);
         }
-		
-	    int result = SnowboyDetectRunDetection(detector,
-                                             buffer, s_index->size>>1, false);
+
+	mono_data_size = stereo_to_mono(buffer,s_index->size>>1,mono_buffer,s_index->size>>1);
+	
+#if 1		
+       int result = SnowboyDetectRunDetection(detector,
+                                             mono_buffer, mono_data_size, false);
         if (result > 0) {
             DUER_LOGI("Hotword %d detected!\n", result);
 			duer_dcs_dialog_cancel();
 			duer_media_tone_play(s_tone_url[rand()%3],5000);
 			event_record_start();
         }
+#endif
 		
-		if((RECORDER_START == s_duer_rec_state)&&s_is_baidu_rec_start){
-			
-			struct timeval time = {0, 0};
-			
-			FD_ZERO(&fdwrite);
-    		FD_SET(s_duer_rec_snd_fd, &fdwrite);
-			
-    		if(select(s_duer_rec_snd_fd + 1, NULL, &fdwrite, NULL, &time)>0){
-				send(s_duer_rec_snd_fd,buffer,s_index->size,0);
-			}else{
-				DUER_LOGI("overloap!!!!!!!!!\n");
-			}
-		}
+	if((RECORDER_START == s_duer_rec_state)&&s_is_baidu_rec_start){
+	     struct timeval time = {0, 0};
+	    FD_ZERO(&fdwrite);
+	    FD_SET(s_duer_rec_snd_fd, &fdwrite);
+	    		
+	    if(select(s_duer_rec_snd_fd + 1, NULL, &fdwrite, NULL, &time)>0){
+		 send(s_duer_rec_snd_fd,mono_buffer,mono_data_size<<1,0);
+             }else{
+		 DUER_LOGI("overloap!!!!!!!!!\n");
+	     }
+	}
     }
-	
+    
     if (buffer) {
         free(buffer);
         buffer = NULL;
+    }
+    if(mono_buffer){
+         free(mono_buffer);
+	 mono_buffer=NULL;	
     }
 	
     snd_pcm_drain(s_index->handle);
@@ -268,10 +309,10 @@ static void recorder_data_send_thread()
 static int duer_open_alsa_pcm()
 {
     int ret = DUER_OK;
-    int result = (snd_pcm_open(&(s_index->handle), "default", SND_PCM_STREAM_CAPTURE, 0));
+    int result = (snd_pcm_open(&(s_index->handle), PCM_STREAM_CAPTURE_DEVICE, SND_PCM_STREAM_CAPTURE, 0));
     if (result < 0)
     {
-        DUER_LOGE("unable to open pcm device: %s", snd_strerror(ret));
+        DUER_LOGE("\n\n****unable to open pcm device: %s*********\n\n", snd_strerror(ret));
         ret = DUER_ERR_FAILED;
     }
     return ret;
