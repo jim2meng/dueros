@@ -28,7 +28,10 @@ baidu lightdueros for linux and Raspberry Pi
 
 pi@raspberrypi:~ $ cd ~
 
+如果没有下载请先执行git clone把源代码先download下来。
 pi@raspberrypi:~ $ git clone https://github.com/jim2meng/dueros.git
+如果已经下载了，进入dueros目录，更新一下代码，确保本地代码是最新的
+pi@raspberrypi:~/dueros $ git pull
 
 pi@raspberrypi:~ $ cd dueros
 
