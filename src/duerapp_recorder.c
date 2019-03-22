@@ -45,7 +45,7 @@
 
 #define ALSA_PCM_NEW_HW_PARAMS_API
 #define SAMPLE_RATE         (16000)
-#define FRAMES_INIT         (640*10)
+#define FRAMES_INIT         (640*5)
 #define CHANNEL 	 	  (1)
 #define FRAMES_SIZE  	  ((16/8) *CHANNEL)// bytes / sample * channels
 //#define PCM_STREAM_CAPTURE_DEVICE	"hw:1,0"
@@ -184,7 +184,7 @@ static void recorder_thread()
 	    continue;
         } else {
             // do nothing
-	    printf("ret=%d\n",ret);
+	   //printf("ret=%d\n",ret);
         }
 
 	mono_data_size = stereo_to_mono(buffer,s_index->size>>1,mono_buffer,s_index->size>>1);
