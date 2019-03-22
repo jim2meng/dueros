@@ -45,7 +45,7 @@
 
 #define ALSA_PCM_NEW_HW_PARAMS_API
 #define SAMPLE_RATE         (16000)
-#define FRAMES_INIT         (640*5)
+#define FRAMES_INIT         (640*2)
 #define CHANNEL 	 	  (1)
 #define FRAMES_SIZE  	  ((16/8) *CHANNEL)// bytes / sample * channels
 //#define PCM_STREAM_CAPTURE_DEVICE	"hw:1,0"
