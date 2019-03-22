@@ -184,7 +184,7 @@ static void recorder_thread()
 	    continue;
         } else {
             // do nothing
-	    printf("ret=%d\n",ret);
+	   //printf("ret=%d\n",ret);
         }
 
 	mono_data_size = stereo_to_mono(buffer,s_index->size>>1,mono_buffer,s_index->size>>1);

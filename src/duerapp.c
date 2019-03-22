@@ -199,8 +199,9 @@ int main(int argc, char *argv[])
 {
 	char *kws_model_fn = "resources/models/keywords.pmdl";
     // Check input arguments
+    int sleep_time = 0;
     int c = 0;
-    while((c = getopt(argc, argv, "p:r:w:")) != -1) {
+    while((c = getopt(argc, argv, "p:r:w:s:")) != -1) {
         switch(c) {
             case 'p':
                 s_pro_path = optarg;
@@ -215,9 +216,14 @@ int main(int argc, char *argv[])
                 duer_args_usage(argv[0]);
                 exit(EXIT_SUCCESS);
                 break;
+            case 's':
+                sleep_time = atoi(optarg);
+                break;
         }
     }
-
+    if(sleep_time>0)
+         sleep(sleep_time);
+    
     if(NULL == s_pro_path) {
         duer_args_usage(argv[0]);
         exit(EXIT_FAILURE);
