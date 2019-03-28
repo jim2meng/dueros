@@ -12,6 +12,7 @@ RECORD_WIDTH = 2
 CHUNK = 1024
 RECORD_SECONDS = 60
 WAVE_OUTPUT_FILENAME = "./output.wav"
+RECORD_DEVICE_NAME = "seeed-2mic-voicecard"
 
 p = pyaudio.PyAudio()
 stream = p.open(
@@ -50,5 +51,31 @@ def sigint_handler(signum, frame):
 # 注册ctrl-c中断
 signal.signal(signal.SIGINT, sigint_handler)
 
-record()   
+print p.get_device_count()
+
+device_index=-1
+
+for index in range(0,p.get_device_count()):
+    info=p.get_device_info_by_index(index)
+    device_name = info.get("name")
+    print device_name
+    print "\n"
+    if device_name.find(RECORD_DEVICE_NAME) != -1:
+        device_index=index
+        break
+
+if device_index != -1:
+    print "find the device"
+    stream.close()
+    stream = p.open(
+            rate=RECORD_RATE,
+            format=p.get_format_from_width(RECORD_WIDTH),
+            channels=RECORD_CHANNELS,
+            input=True,
+            input_device_index = device_index,
+            start=False)
+else:
+    print "don't find the device"
+    
+record()
 
