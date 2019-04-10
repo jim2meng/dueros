@@ -7,12 +7,13 @@ import sys
 import os
 
 RECORD_RATE = 16000
-RECORD_CHANNELS = 1
+RECORD_CHANNELS = 2
 RECORD_WIDTH = 2
 CHUNK = 1024
 RECORD_SECONDS = 60
 WAVE_OUTPUT_FILENAME = "./output.wav"
-RECORD_DEVICE_NAME = "seeed-2mic-voicecard"
+#RECORD_DEVICE_NAME = "seeed-2mic-voicecard"
+RECORD_DEVICE_NAME = "USB Camera-B4.09.24.1"
 
 p = pyaudio.PyAudio()
 stream = p.open(
@@ -25,9 +26,9 @@ stream = p.open(
 wave_file = wave.open(WAVE_OUTPUT_FILENAME, "wb")
 
 def record():
-    wave_file.setnchannels(1)
+    wave_file.setnchannels(RECORD_CHANNELS)
     wave_file.setsampwidth(2)
-    wave_file.setframerate(16000)
+    wave_file.setframerate(RECORD_RATE)
     stream.start_stream()
     print("* recording")
     for i in range(0, int(RECORD_RATE / CHUNK * RECORD_SECONDS)):

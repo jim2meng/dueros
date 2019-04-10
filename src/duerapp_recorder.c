@@ -40,16 +40,19 @@
 #include "duerapp_config.h"
 #include "lightduer_voice.h"
 #include "lightduer_dcs_router.h"
-
+#include <alsa/asoundlib.h>
 #include "snowboy-detect-c-wrapper.h"
 
 #define ALSA_PCM_NEW_HW_PARAMS_API
 #define SAMPLE_RATE         (16000)
-#define FRAMES_INIT         (640*2)
-#define CHANNEL 	 	  (1)
+#define FRAMES_INIT         (640*4)
+#define CHANNEL 	 	  (2)
 #define FRAMES_SIZE  	  ((16/8) *CHANNEL)// bytes / sample * channels
-//#define PCM_STREAM_CAPTURE_DEVICE	"hw:1,0"
+//#define PCM_STREAM_CAPTURE_DEVICE	"hw:2,0"
 #define PCM_STREAM_CAPTURE_DEVICE	"default"
+
+
+//#define RECORD_DATA_TO_FILE
 
 static int s_duer_rec_snd_fd=-1;
 static int s_duer_rec_recv_fd=-1;
@@ -82,6 +85,94 @@ int duer_set_kws_model_file(char *filename)
 	return 0;
 }
 
+typedef struct _pcm_header_t {
+    char    pcm_header[4];
+    size_t  pcm_length;
+    char    format[8];
+    int     bit_rate;
+    short   pcm;
+    short   channel;
+    int     sample_rate;
+    int     byte_rate;
+    short   block_align;
+    short   bits_per_sample;
+    char    fix_data[4];
+    size_t  data_length;
+} pcm_header_t;
+
+static pcm_header_t s_pcm_header = {
+    {'R', 'I', 'F', 'F'},
+    (size_t)-1,
+    {'W', 'A', 'V', 'E', 'f', 'm', 't', ' '},
+    0x10,
+    0x01,
+    0x01,
+#if 1 //def SAMPLE_RATE_16K
+    0x3E80,
+    0x7D00,
+#else //8k
+    0x1F40,
+    0x3E80,
+#endif // SAMPLE_RATE_16K
+    0x02,
+    0x10,
+    {'d', 'a', 't', 'a'},
+    (size_t)-1
+};
+
+#ifdef RECORD_DATA_TO_FILE
+
+static FILE *s_voice_file=NULL;
+
+int duer_store_voice_start(int name_id)
+{
+    DUER_LOGD("start");
+    if (s_voice_file) {
+        fclose(s_voice_file);
+        s_voice_file = NULL;
+    }
+
+    char _name[64];
+    snprintf(_name, sizeof(_name), "./%08d.wav", name_id);
+    s_voice_file = fopen(_name, "wb");
+    if (!s_voice_file) {
+        DUER_LOGE("can't open file %s", _name);
+        return -1;
+    } else {
+        DUER_LOGD("begin write to file:%s", _name);
+    }
+    fwrite(&s_pcm_header, 1, sizeof(s_pcm_header), s_voice_file);
+    s_pcm_header.data_length = 0;
+    s_pcm_header.pcm_length = sizeof(s_pcm_header) - 8;
+
+    return 0;
+}
+
+int duer_store_voice_write(const void *data, uint32_t size)
+{
+    DUER_LOGD("data");
+    if (s_voice_file) {
+        fwrite(data, 1, size, s_voice_file);
+        s_pcm_header.data_length += size;
+    }
+    return 0;
+}
+
+int duer_store_voice_end()
+{
+    if (s_voice_file) {
+        s_pcm_header.pcm_length += s_pcm_header.data_length;
+        fseek(s_voice_file, 0, SEEK_SET);
+        fwrite(&s_pcm_header, 1, sizeof(s_pcm_header), s_voice_file);
+        fclose(s_voice_file);
+        s_voice_file = NULL;
+        DUER_LOGD("finish the voice record");
+    }
+    return 0;
+}
+#endif
+
+
 int stereo_to_mono(int16_t *in,int ilen,int16_t *out,int outlen)
 {
 	int i=0;
@@ -95,6 +186,12 @@ int stereo_to_mono(int16_t *in,int ilen,int16_t *out,int outlen)
 			//out[i] = in[2*i];
 		}
 		return ilen>>1;
+	}else if(CHANNEL==4){
+		for(i=0;i<ilen>>2;i++){
+			//out[i] = (in[4*i]+in[4*i+1]+in[4*i+2]+in[4*i+3])>>2;
+			out[i] = in[4*i+2];
+		}
+		return ilen>>2;			
 	}
 	
 	return 0;
@@ -184,7 +281,7 @@ static void recorder_thread()
 	    continue;
         } else {
             // do nothing
-	   //printf("ret=%d\n",ret);
+	   printf("ret=%d\n",ret);
         }
 
 	mono_data_size = stereo_to_mono(buffer,s_index->size>>1,mono_buffer,s_index->size>>1);
@@ -197,6 +294,10 @@ static void recorder_thread()
 			duer_dcs_dialog_cancel();
 			duer_media_tone_play(s_tone_url[rand()%3],5000);
 			event_record_start();
+			#ifdef RECORD_DATA_TO_FILE
+			duer_store_voice_end();
+			duer_store_voice_start(time(NULL));
+			#endif
         }
 #endif
 		
@@ -207,6 +308,9 @@ static void recorder_thread()
 	    		
 	    if(select(s_duer_rec_snd_fd + 1, NULL, &fdwrite, NULL, &time)>0){
 		 send(s_duer_rec_snd_fd,mono_buffer,mono_data_size<<1,0);
+		 #ifdef RECORD_DATA_TO_FILE
+		 duer_store_voice_write(mono_buffer,mono_data_size<<1);
+		 #endif
              }else{
 		 DUER_LOGI("overloap!!!!!!!!!\n");
 	     }
@@ -279,7 +383,7 @@ static void recorder_data_send_thread()
 			recvlen = recv(s_duer_rec_recv_fd, buffer, size, 0);
 			if(recvlen>0){
 				printf(".&.");
-				duer_voice_send(buffer, s_index->size);
+				duer_voice_send(buffer, recvlen);
 			}else{
 				DUER_LOGE("recv fail!\n");
 			}
