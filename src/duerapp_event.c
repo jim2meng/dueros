@@ -33,6 +33,7 @@
 #include "duerapp_config.h"
 #include "duerapp_alert.h"
 #include "duerapp.h"
+#include "led.h"
 
 #define VOLUME_STEP (5)
 
@@ -94,6 +95,7 @@ void duer_voice_mode_translate_record()
 void event_record_start()
 {
     DUER_LOGV("KEY_DOWN");
+    led_set_mode(LED_MODE_RECORD_START);
     if (DUER_VOICE_MODE_DEFAULT == duer_voice_get_mode()){
         duer_voice_mode_default_record();
     } else {
@@ -214,12 +216,15 @@ void duer_event_loop()
     tcsetattr(kbd_fd, TCSANOW, &kbd_bak);
 }
 
+int  duer_recorder_test_end(void);
 
 void duer_dcs_stop_listen_handler(void)
 {
+    led_set_mode(LED_MODE_LISTEN_STOP); 
     duer_recorder_stop();
     s_is_record = false;
     DUER_LOGI("Listen stop");
+    duer_recorder_test_end();
 }
 
 void duer_dcs_listen_handler(void)

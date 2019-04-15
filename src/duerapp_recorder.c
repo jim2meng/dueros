@@ -51,7 +51,6 @@
 //#define PCM_STREAM_CAPTURE_DEVICE	"hw:2,0"
 #define PCM_STREAM_CAPTURE_DEVICE	"default"
 
-
 //#define RECORD_DATA_TO_FILE
 
 static int s_duer_rec_snd_fd=-1;
@@ -100,6 +99,8 @@ typedef struct _pcm_header_t {
     size_t  data_length;
 } pcm_header_t;
 
+int g_recorder_channel = 0;
+
 static pcm_header_t s_pcm_header = {
     {'R', 'I', 'F', 'F'},
     (size_t)-1,
@@ -120,7 +121,6 @@ static pcm_header_t s_pcm_header = {
     (size_t)-1
 };
 
-#ifdef RECORD_DATA_TO_FILE
 
 static FILE *s_voice_file=NULL;
 
@@ -133,7 +133,7 @@ int duer_store_voice_start(int name_id)
     }
 
     char _name[64];
-    snprintf(_name, sizeof(_name), "./%08d.wav", name_id);
+    snprintf(_name, sizeof(_name), "./%d.wav", name_id);
     s_voice_file = fopen(_name, "wb");
     if (!s_voice_file) {
         DUER_LOGE("can't open file %s", _name);
@@ -170,8 +170,6 @@ int duer_store_voice_end()
     }
     return 0;
 }
-#endif
-
 
 int stereo_to_mono(int16_t *in,int ilen,int16_t *out,int outlen)
 {
@@ -182,8 +180,14 @@ int stereo_to_mono(int16_t *in,int ilen,int16_t *out,int outlen)
 		return ilen;
 	}else if(CHANNEL==2){
 		for(i=0;i<ilen>>1;i++){
-			out[i] = (in[2*i]+in[2*i+1])>>1;
-			//out[i] = in[2*i];
+			 if(duer_app_is_test_mode()!=1||(g_recorder_channel==0)){
+			      out[i] = (in[2*i]+in[2*i+1])>>1;
+			    //out[i] = in[2*i];
+			}else if(g_recorder_channel==1){
+				  out[i] = in[2*i];    
+			}else if(g_recorder_channel==2){
+				   out[i] = in[2*i+1];     
+			}
 		}
 		return ilen>>1;
 	}else if(CHANNEL==4){
@@ -192,6 +196,36 @@ int stereo_to_mono(int16_t *in,int ilen,int16_t *out,int outlen)
 			out[i] = in[4*i+2];
 		}
 		return ilen>>2;			
+	}
+	
+	return 0;
+}
+
+int  duer_recorder_test_start(int channel)
+{
+	 g_recorder_channel = channel;   
+	if(duer_app_is_test_mode()){
+		
+		if(g_recorder_channel==1){
+			duer_media_tone_play("./resources/left.mp3",20000);
+		}else if(g_recorder_channel==2){
+			   duer_media_tone_play("./resources/right.mp3",20000); 
+		}
+		duer_store_voice_end();
+		duer_store_voice_start(g_recorder_channel);
+	}
+	
+	return 0;  
+}
+
+int  duer_recorder_test_end(void)
+{
+	char fn[32];
+	
+	sprintf(fn,"./%d.wav",g_recorder_channel);
+	duer_store_voice_end();
+        if(duer_app_is_test_mode()){
+               duer_media_tone_play(fn,20000); 
 	}
 	
 	return 0;
@@ -281,7 +315,7 @@ static void recorder_thread()
 	    continue;
         } else {
             // do nothing
-	   printf("ret=%d\n",ret);
+	   //printf("ret=%d\n",ret);
         }
 
 	mono_data_size = stereo_to_mono(buffer,s_index->size>>1,mono_buffer,s_index->size>>1);
@@ -297,6 +331,11 @@ static void recorder_thread()
 			#ifdef RECORD_DATA_TO_FILE
 			duer_store_voice_end();
 			duer_store_voice_start(time(NULL));
+			#else
+			if(duer_app_is_test_mode()){
+				    duer_store_voice_end();
+				    duer_store_voice_start(g_recorder_channel);
+			}
 			#endif
         }
 #endif
@@ -310,6 +349,11 @@ static void recorder_thread()
 		 send(s_duer_rec_snd_fd,mono_buffer,mono_data_size<<1,0);
 		 #ifdef RECORD_DATA_TO_FILE
 		 duer_store_voice_write(mono_buffer,mono_data_size<<1);
+		 #else
+		 if(duer_app_is_test_mode()){
+			DUER_LOGI("test mode\n");
+			duer_store_voice_write(mono_buffer,mono_data_size<<1);
+		}
 		 #endif
              }else{
 		 DUER_LOGI("overloap!!!!!!!!!\n");

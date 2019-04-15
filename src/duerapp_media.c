@@ -264,9 +264,14 @@ void duer_media_speak_play(const char *url)
 
 void duer_media_tone_play(const char *path,int wait_tm) {
 	
+      GstElement *decoder =NULL;
     GstElement *pipeline = gst_pipeline_new("audio-player");
     GstElement *source = gst_element_factory_make("filesrc", "file-source");
-    GstElement *decoder = gst_element_factory_make("mad", "mad-decoder");
+    if(strstr(path,".wav")!=NULL){
+        decoder = gst_element_factory_make("wavparse", "wav-parser");
+    }else{
+        decoder = gst_element_factory_make("mad", "mad-decoder");
+    }
     GstElement *sink = gst_element_factory_make("autoaudiosink", "audio-output");
     if (!(pipeline && source && decoder && sink)) {
         DUER_LOGE("create alert element failed!");

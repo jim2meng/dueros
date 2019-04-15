@@ -35,6 +35,8 @@
 #include "duerapp_alert.h"
 #include "duerapp.h"
 #include "lightduer_system_info.h"
+#include "led.h"
+#include "button.h"
 
 const duer_system_static_info_t g_system_static_info = {
     .os_version         = "Ubuntu 16.04.4",
@@ -86,6 +88,132 @@ static duer_status_t duer_app_test_control_point(duer_context ctx, duer_msg_t* m
     free(cachedToken);
     return DUER_OK;
 }
+
+static duer_status_t robot_control(duer_context ctx, duer_msg_t* msg, duer_addr_t* addr)
+{
+	char value[64];
+	char *p;
+	char *end;
+	int robot_mode;
+
+	if(msg->payload_len>=64)
+	{
+		DUER_LOGE("invalid msg!");
+		return DUER_OK;		
+	}
+	strncpy(value,(char*)msg->payload,msg->payload_len);
+	value[msg->payload_len]=0;
+	DUER_LOGI("robot control %s\n",value);
+
+	if((p=strstr(value,"value"))==NULL)
+	{
+		DUER_LOGE("invalid msg!");
+		return DUER_OK;
+	}
+
+	p += strlen("value");
+	if((p=strstr(p,":"))==NULL)
+	{
+		DUER_LOGE("invalid msg!");
+		return DUER_OK; 
+	}
+
+	p++;
+	if((p=strstr(p,"\""))==NULL)
+	{
+		DUER_LOGE("invalid msg!");
+		return DUER_OK; 
+	}
+	p++;
+
+	end = strstr(p,"\"");
+	if(end==NULL)
+	{
+		DUER_LOGE("invalid msg!");
+		return DUER_OK;
+	}
+	
+	*end = 0;
+	robot_mode = atoi(p);
+	DUER_LOGI("robot mode %d\n",robot_mode);
+	
+	return DUER_OK;
+}
+
+
+static duer_status_t light_control(duer_context ctx, duer_msg_t* msg, duer_addr_t* addr)
+{
+	char value[64];
+	char *p;
+	char *end;
+	int ivalue;
+
+	if(msg->payload_len>=64)
+	{
+		DUER_LOGE("invalid msg!");
+		return DUER_OK;		
+	}
+	strncpy(value,(char*)msg->payload,msg->payload_len);
+	value[msg->payload_len]=0;
+	DUER_LOGI("robot control %s\n",value);
+
+	if((p=strstr(value,"value"))==NULL)
+	{
+		DUER_LOGE("invalid msg!");
+		return DUER_OK;
+	}
+
+	p += strlen("value");
+	if((p=strstr(p,":"))==NULL)
+	{
+		DUER_LOGE("invalid msg!");
+		return DUER_OK; 
+	}
+
+	p++;
+	if((p=strstr(p,"\""))==NULL)
+	{
+		DUER_LOGE("invalid msg!");
+		return DUER_OK; 
+	}
+	p++;
+
+	end = strstr(p,"\"");
+	if(end==NULL)
+	{
+		DUER_LOGE("invalid msg!");
+		return DUER_OK;
+	}
+	
+	*end = 0;
+	ivalue = atoi(p);
+	DUER_LOGI("value %d\n",ivalue);
+	if(ivalue==0)
+    {
+            led_set_mode(LED_MODE_OFF);
+    }
+    else
+    {
+            led_set_mode(LED_MODE_GREEN);
+    }
+    
+    
+	return DUER_OK;
+
+}
+
+void duer_app_add_robot_control(void)
+{
+	duer_res_t res = {DUER_RES_MODE_DYNAMIC, DUER_RES_OP_PUT, "robot_run", robot_control};
+	duer_add_resources(&res, 1);
+}
+
+void duer_app_add_light_control(void)
+{
+	duer_res_t res = {DUER_RES_MODE_DYNAMIC, DUER_RES_OP_PUT, "light_control", light_control};
+	duer_add_resources(&res, 1);
+}
+
 
 static void duer_app_test_control_point_init()
 {
@@ -144,6 +272,8 @@ static void duer_event_hook(duer_event_t *event)
             {
                 duer_app_dcs_init();
                 duer_app_test_control_point_init();
+                duer_app_add_robot_control();
+                duer_app_add_light_control();
                 s_reconnect_time = 1;
                 s_started = true;
             }
@@ -195,13 +325,20 @@ static void duer_args_usage(char *param) {
     );
 }
 
+static int  s_test_mode = 0;
+
+int  duer_app_is_test_mode(void)
+{
+        return s_test_mode;
+}
+
 int main(int argc, char *argv[])
 {
 	char *kws_model_fn = "resources/models/keywords.pmdl";
     // Check input arguments
     int sleep_time = 0;
     int c = 0;
-    while((c = getopt(argc, argv, "p:r:w:s:")) != -1) {
+    while((c = getopt(argc, argv, "p:r:w:s:t:")) != -1) {
         switch(c) {
             case 'p':
                 s_pro_path = optarg;
@@ -215,6 +352,9 @@ int main(int argc, char *argv[])
             case 'h':
                 duer_args_usage(argv[0]);
                 exit(EXIT_SUCCESS);
+                break;
+            case  't':
+                s_test_mode = (atoi(optarg)==1)?1:0;
                 break;
             case 's':
                 sleep_time = atoi(optarg);
@@ -231,7 +371,7 @@ int main(int argc, char *argv[])
 
     // init CA
     duer_initialize();
-
+    
     // Set the Duer Event Callback
     duer_set_event_callback(duer_event_hook);
 
@@ -243,6 +383,16 @@ int main(int argc, char *argv[])
     // try conntect baidu cloud
     duer_test_start(s_pro_path);
 
+    led_init();
+    
+    button_init();
+    
+    led_set_mode(LED_MODE_FLASH0);
+    sleep(2);
+    led_set_mode(LED_MODE_OFF);
+    sleep(1);
+    led_set_mode(LED_MODE_OFF);
+      
     duer_event_loop();
 	
     duer_media_destroy();

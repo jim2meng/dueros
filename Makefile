@@ -27,11 +27,15 @@ OBJFILES += src/duerapp_event.o
 OBJFILES += src/duerapp_media.o
 OBJFILES += src/duerapp_profile_config.o
 OBJFILES += src/duerapp_recorder.o
+OBJFILES += src/apa102.o
+OBJFILES += src/led.o
+OBJFILES += src/button.o
 
 CFLAGS += $(shell pkg-config --cflags --libs gstreamer-1.0)
 LDLIBS += -lm \
     -lrt \
     -lasound \
+	 -lwiringPi \
     $(shell pkg-config --cflags --libs gstreamer-1.0)
 
 all: $(TARGET)

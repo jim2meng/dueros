@@ -39,7 +39,7 @@
 #define FRAMES_INIT         			(640*4)
 #define CHANNEL 	 	  			(4)
 #define FRAMES_SIZE  	  			((16/8) *CHANNEL)
-#define PCM_STREAM_CAPTURE_DEVICE	"hw:1,0"
+#define PCM_STREAM_CAPTURE_DEVICE	"hw:2,0"
 //#define PCM_STREAM_CAPTURE_DEVICE	"default"
 
 typedef struct{
