@@ -48,7 +48,7 @@
 #define FRAMES_INIT         (640*4)
 #define CHANNEL 	 	  (2)
 #define FRAMES_SIZE  	  ((16/8) *CHANNEL)// bytes / sample * channels
-//#define PCM_STREAM_CAPTURE_DEVICE	"hw:2,0"
+//#define PCM_STREAM_CAPTURE_DEVICE	"hw:1,0"
 #define PCM_STREAM_CAPTURE_DEVICE	"default"
 
 //#define RECORD_DATA_TO_FILE
@@ -192,8 +192,8 @@ int stereo_to_mono(int16_t *in,int ilen,int16_t *out,int outlen)
 		return ilen>>1;
 	}else if(CHANNEL==4){
 		for(i=0;i<ilen>>2;i++){
-			//out[i] = (in[4*i]+in[4*i+1]+in[4*i+2]+in[4*i+3])>>2;
-			out[i] = in[4*i+2];
+			out[i] = (in[4*i]+in[4*i+1]+in[4*i+2]+in[4*i+3])>>2;
+			//out[i] = in[4*i+2];
 		}
 		return ilen>>2;			
 	}
@@ -242,6 +242,7 @@ static void recorder_thread()
 	//const char sensitivity_str[] = "0.5,0.5";
 	//const char model_filename[] = "resources/models/keywords.pmdl";
 	char *model_filename=s_kws_model_filename;
+	//const char sensitivity_str[] = "0.5,0.6,0.6";
 	const char sensitivity_str[] = "0.5";
 	float audio_gain = 1.1;
 	bool apply_frontend = false;

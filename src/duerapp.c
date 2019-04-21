@@ -383,16 +383,19 @@ int main(int argc, char *argv[])
     // try conntect baidu cloud
     duer_test_start(s_pro_path);
 
-    led_init();
+    if(s_test_mode)
+        led_init();
     
     button_init();
     
+    if(s_test_mode){
     led_set_mode(LED_MODE_FLASH0);
     sleep(2);
     led_set_mode(LED_MODE_OFF);
     sleep(1);
     led_set_mode(LED_MODE_OFF);
-      
+    }
+    
     duer_event_loop();
 	
     duer_media_destroy();

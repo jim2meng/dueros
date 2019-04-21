@@ -153,6 +153,9 @@ int led_set_mode(int mode)
 {
 		s_cur_led_mode = mode;
 		
+		if(s_apa102led_dev==NULL)
+				return -1;
+		
 		duer_timer_stop(s_led_timer);
 		switch(mode)
 		{
@@ -184,12 +187,17 @@ int led_set_mode(int mode)
 
 int  led_off(void)
 {
+		if(s_apa102led_dev==NULL)
+			return -1;
+				
 		apa102_clear_strip(s_apa102led_dev);
 		return 0;
 }
 
 int  led_on(void)
 {
+		if(s_apa102led_dev==NULL)
+				return -1;
 		return 0;
 }
 
