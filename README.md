@@ -44,17 +44,24 @@ pi@raspberrypi:~/dueros $ make
 
 ### 3. 运行方式：
 
-运行编译生成的可执行文件`duerospi`
-参数 -p `<路径>/profile`
-参数 -w '[路径]/唤醒词模型文件'
+运行编译生成的可执行文件`duerospi` 
+
+参数 -p `<路径>/profile` 
+
+参数 -w '[路径]/唤醒词模型文件' 
 
 如果不指定唤醒词模型，默认为“小度小度”.
 
+运行之前我们先要进入dueros目录，可执行文件在这个目录下面。
+
 例如：
-	./duerospi -p ./profile  (通过小度小度唤醒)
-	./duerospi -p ./profile -w ./resources/models/snowboy.umdl  (通过snowboy唤醒)
+
+	./duerospi -p ./profile  (通过小度小度唤醒) 
+	
+	./duerospi -p ./profile -w ./resources/models/snowboy.umdl  (通过snowboy唤醒) 
 
 注意：项目自带的profile都是一样的，profile是设备ID,如果保证以后都可以正常使用Dueros,请使用自己设备的profile,或者向我们申请一个profile.
+
 否则如果多个人同时使用一个profile,只有最后一个人使用正常，之前的都会与Dueros云服务器断开。
 
 	
