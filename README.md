@@ -15,7 +15,8 @@ baidu lightdueros for linux and Raspberry Pi
 	sudo apt-get install libgstreamer1.0*
 	sudo apt-get install gstreamer1.0-omx-generic*
 	sudo apt-get install gstreamer1.0-plugins*
-
+	卸载下面的，不然gstreamer在树莓派上可能运行不成功
+	sudo apt-get remove gstreamer1.0-omx-rpi*
 #### snowboy 使用的第三方库
 	sudo apt-get install libatlas-base-dev
 	
@@ -34,9 +35,9 @@ pi@raspberrypi:~ $ git clone https://github.com/jim2meng/dueros.git
 
 如果已经下载了，进入dueros目录，更新一下代码，确保本地代码是最新的
 
-pi@raspberrypi:~/dueros $ git pull
-
 pi@raspberrypi:~ $ cd dueros
+
+pi@raspberrypi:~/dueros $ git pull
 
 pi@raspberrypi:~/dueros $ make 
 
