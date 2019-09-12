@@ -65,7 +65,8 @@ static bool s_is_suspend = false;
 static bool s_is_baidu_rec_start = false;
 static pthread_t s_rec_send_threadID;
 static char * s_kws_model_filename = NULL;
-const char *s_tone_url[3] = {"./resources/60.mp3","./resources/61.mp3","./resources/62.mp3"};
+//const char *s_tone_url[3] = {"./resources/60.mp3","./resources/61.mp3","./resources/62.mp3"};
+const char *s_tone_url[3] = {"./resources/60.wav","./resources/61.wav","./resources/62.wav"};
 	
 extern 	void event_record_start();
 

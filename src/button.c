@@ -57,7 +57,8 @@ static void button_polling_thread()
 										{
 											    duer_recorder_test_start(channel_id);
 											    duer_dcs_dialog_cancel();
-												duer_media_tone_play("./resources/16.mp3");
+												//duer_media_tone_play("./resources/16.mp3");
+												duer_media_tone_play("./resources/16.wav");
 												event_record_start();
 												if(channel_id==1)
 												{
@@ -71,7 +72,8 @@ static void button_polling_thread()
 										else
 										{
 												duer_dcs_dialog_cancel();
-												duer_media_tone_play("./resources/16.mp3");
+												//duer_media_tone_play("./resources/16.mp3");
+												duer_media_tone_play("./resources/16.wav");
 												event_record_start();
 										}	
 								}
