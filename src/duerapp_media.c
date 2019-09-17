@@ -146,10 +146,12 @@ static gboolean bus_call(GstBus *bus, GstMessage *msg, gpointer data)
 
 static void speak_play()
 {
+		if (s_pinfo[0] && s_pinfo[0]->pip) {
     if (s_mute) {
         g_object_set(G_OBJECT(s_pinfo[0]->pip), "volume", 0.0, NULL);
-    } else {
-        //g_object_set(G_OBJECT(s_pinfo[0]->pip), "volume", s_vol, NULL);
+    } else  if (s_pinfo[0] && s_pinfo[0]->pip) {
+        g_object_set(G_OBJECT(s_pinfo[0]->pip), "volume", s_vol, NULL);
+    }
     }
     GstBus *bus = gst_pipeline_get_bus(GST_PIPELINE(s_pinfo[0]->pip));
 
@@ -170,10 +172,12 @@ static void audio_play()
     if (s_pinfo[2]) {
         delete_play_info(&(s_pinfo[2]));
     }
+    if (s_pinfo[0] && s_pinfo[0]->pip) {
     if (s_mute) {
         g_object_set(G_OBJECT(s_pinfo[0]->pip), "volume", 0.0, NULL);
     } else {
-        //g_object_set(G_OBJECT(s_pinfo[0]->pip), "volume", s_vol, NULL);
+        g_object_set(G_OBJECT(s_pinfo[0]->pip), "volume", s_vol, NULL);
+    }
     }
     GstBus *bus = gst_pipeline_get_bus(GST_PIPELINE(s_pinfo[0]->pip));
 
