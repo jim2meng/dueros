@@ -243,12 +243,8 @@ static void   recording_pcm_data()
 	       printf("ret=%d %d\n",ret,s_index->size);
         }
 	
-	for(i=0;i<CHANNEL+1;i++){
-		    if(i==CHANNEL){
-                           mono_data_size = read_pcm_mono_data(buffer,s_index->size>>1,mono_buffer,CHANNEL);			      
-		    }else{
-	                   mono_data_size = read_pcm_channel_data(buffer,s_index->size>>1,mono_buffer,i,CHANNEL);
-		    }
+	for(i=0;i<CHANNEL;i++){
+	      mono_data_size = read_pcm_channel_data(buffer,s_index->size>>1,mono_buffer,i,CHANNEL);
 		    duer_store_voice_write(s_rec_files[i],mono_buffer,mono_data_size<<1);
 	}
     }
@@ -342,7 +338,7 @@ int main(int argc, char *argv[])
         int ret=0;
 	int i;
         
-	for(i=0;i<CHANNEL+1;i++){
+	for(i=0;i<CHANNEL;i++){
 	     s_rec_files[i] = NULL;  
 	      s_rec_files[i] =  duer_store_voice_start(i);
 	}
