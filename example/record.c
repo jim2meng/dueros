@@ -56,7 +56,7 @@ static rec_config_t *s_index = NULL;
 
 typedef struct _pcm_header_t {
     char    pcm_header[4];
-    size_t  pcm_length;
+    uint32_t  pcm_length;
     char    format[8];
     int     bit_rate;
     short   pcm;
@@ -66,12 +66,12 @@ typedef struct _pcm_header_t {
     short   block_align;
     short   bits_per_sample;
     char    fix_data[4];
-    size_t  data_length;
+    uint32_t  data_length;
 } pcm_header_t;
 
 static pcm_header_t s_pcm_header = {
     {'R', 'I', 'F', 'F'},
-    (size_t)-1,
+    ( uint32_t)-1,
     {'W', 'A', 'V', 'E', 'f', 'm', 't', ' '},
     0x10,
     0x01,
@@ -86,7 +86,7 @@ static pcm_header_t s_pcm_header = {
     0x02,
     0x10,
     {'d', 'a', 't', 'a'},
-    (size_t)-1
+    (uint32_t)-1
 };
 
 
