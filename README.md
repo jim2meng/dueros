@@ -25,7 +25,7 @@ baidu lightdueros for linux and Raspberry Pi
 	sudo apt-get install alsa-base alsa-utils libasound2-dev
 
 #### wringPi 树莓派4B
-        树莓派4B之前版本需要执行，树莓派4B 要更新wringPi库，默认可能版本低，不能正常使用 
+        树莓派4B之前版本不需要执行，树莓派4B 要更新wringPi库，默认可能版本低，不能正常使用 
         wget https://project-downloads.drogon.net/wiringpi-latest.deb
         sudo dpkg -i wiringpi-latest.deb
 	
