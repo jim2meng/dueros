@@ -244,7 +244,7 @@ static void recorder_thread()
 	//const char model_filename[] = "resources/models/keywords.pmdl";
 	char *model_filename=s_kws_model_filename;
 	//const char sensitivity_str[] = "0.5,0.6,0.6";
-	const char sensitivity_str[] = "0.5";
+	char *sensitivity_str = "0.5";
 	float audio_gain = 1.1;
 	bool apply_frontend = false;
 
@@ -252,6 +252,10 @@ static void recorder_thread()
 		model_filename = "resources/models/keywords.pmdl";
 	}
 	
+	if(strstr(model_filename,"xiaoduxiaodu_all.umdl")!=NULL){
+	    sensitivity_str= "0.5,0.6,0.5";
+	}
+		
 	// Initializes Snowboy detector.
 	SnowboyDetect* detector = SnowboyDetectConstructor(resource_filename,
 	                                                 (const char*)model_filename);
