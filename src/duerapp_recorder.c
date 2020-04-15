@@ -249,7 +249,8 @@ static void recorder_thread()
 	bool apply_frontend = false;
 
 	if(model_filename==NULL){
-		model_filename = "resources/models/keywords.pmdl";
+		//model_filename = "resources/models/keywords.pmdl";
+		model_filename = "resources/models/xiaoduxiaodu_all.umdl";
 	}
 	
 	if(strstr(model_filename,"xiaoduxiaodu_all.umdl")!=NULL){
