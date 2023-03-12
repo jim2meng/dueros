@@ -35,12 +35,13 @@
 #include <sys/types.h>
 
 #define ALSA_PCM_NEW_HW_PARAMS_API
-#define SAMPLE_RATE         			(16000)
+#define SAMPLE_RATE         			(48000)
 #define FRAMES_INIT         			(640*4)
-#define CHANNEL 	 	  			(4)
-#define FRAMES_SIZE  	  			((16/8) *CHANNEL)
+#define CHANNEL 	 	  				 		(8)
+#define FRAMES_SIZE  	  					((16/8) *CHANNEL)
 #define PCM_STREAM_CAPTURE_DEVICE	"hw:2,0"
 //#define PCM_STREAM_CAPTURE_DEVICE	"default"
+
 
 typedef struct{
     int dir;
@@ -76,13 +77,8 @@ static pcm_header_t s_pcm_header = {
     0x10,
     0x01,
     0x01,
-#if 1 //def SAMPLE_RATE_16K
-    0x3E80,
-    0x7D00,
-#else //8k
-    0x1F40,
-    0x3E80,
-#endif // SAMPLE_RATE_16K
+    SAMPLE_RATE,
+    SAMPLE_RATE*2,
     0x02,
     0x10,
     {'d', 'a', 't', 'a'},
